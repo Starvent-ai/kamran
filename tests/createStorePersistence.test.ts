@@ -44,7 +44,8 @@ describe("createStore persistence", () => {
   });
 
   it("changes made after hydration finishes persist and merge with the previously saved state", async () => {
-    createStore<{ items: string[] }>({ items: ["saved"] }, "test-persist-key-3");
+    const first = createStore<{ items: string[] }>({ items: [] }, "test-persist-key-3");
+    first.setState((prev) => ({ items: [...prev.items, "saved"] }));
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const second = createStore<{ items: string[] }>({ items: ["seed"] }, "test-persist-key-3");
