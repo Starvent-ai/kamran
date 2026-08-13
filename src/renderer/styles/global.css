@@ -1,0 +1,790 @@
+@import "vazirmatn/Vazirmatn-font-face.css";
+@import "./tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--sv-bg);
+  /* Fine, irregular gold veining over the light cream base — layered
+     elongated radial gradients at varied angles/positions/opacities so
+     it reads as organic marbling rather than a repeating pattern. */
+  background-image:
+    radial-gradient(ellipse 140% 6% at 12% 22%, rgba(201, 151, 44, 0.16), transparent 60%),
+    radial-gradient(ellipse 120% 5% at 78% 14%, rgba(227, 191, 92, 0.14), transparent 65%),
+    radial-gradient(ellipse 160% 4% at 40% 48%, rgba(201, 151, 44, 0.1), transparent 60%),
+    radial-gradient(ellipse 130% 5% at 85% 62%, rgba(227, 191, 92, 0.13), transparent 60%),
+    radial-gradient(ellipse 150% 4% at 20% 78%, rgba(201, 151, 44, 0.12), transparent 65%),
+    radial-gradient(ellipse 110% 3% at 60% 90%, rgba(227, 191, 92, 0.1), transparent 60%),
+    radial-gradient(ellipse 90% 90% at 50% 0%, rgba(255, 255, 255, 0.35), transparent 55%);
+  background-attachment: fixed;
+  color: var(--sv-text-100);
+  font-family: var(--sv-font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: text;
+}
+
+::selection {
+  background: var(--sv-gold-700);
+  color: var(--sv-text-100);
+}
+
+:focus-visible {
+  outline: 2px solid var(--sv-gold-500);
+  outline-offset: 2px;
+  border-radius: var(--sv-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------- App shell ---------- */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  height: 100vh;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sv-space-8);
+  padding-bottom: 50vh;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  background: var(--sv-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-inline-start: 1px solid var(--sv-border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--sv-space-6) var(--sv-space-4);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-3);
+  padding: 0 var(--sv-space-2) var(--sv-space-6);
+  margin-bottom: var(--sv-space-4);
+  border-bottom: 1px solid var(--sv-border);
+}
+
+.sidebar__brand img {
+  width: 34px;
+  height: 34px;
+}
+
+.sidebar__brand-name {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: var(--sv-gold-100);
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-1);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Slim, unobtrusive scrollbar — matches the dark premium theme instead of
+   the OS default. */
+.sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar__nav::-webkit-scrollbar-thumb {
+  background: var(--sv-border-strong);
+  border-radius: 3px;
+}
+.sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-1);
+  margin-bottom: var(--sv-space-3);
+}
+
+.sidebar__group-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--sv-text-600);
+  text-transform: uppercase;
+  padding: 0 var(--sv-space-3);
+  margin-bottom: 2px;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-3);
+  padding: 10px var(--sv-space-3);
+  border-radius: var(--sv-radius-md);
+  color: var(--sv-text-400);
+  background: transparent;
+  border: none;
+  text-align: right;
+  font-size: 14px;
+  transition: background-color 160ms var(--sv-ease), color 160ms var(--sv-ease);
+}
+
+.sidebar__link:hover {
+  background: var(--sv-surface-raised);
+  color: var(--sv-text-100);
+}
+
+.sidebar__link[data-active="true"] {
+  background: linear-gradient(90deg, rgba(201, 151, 44, 0.18), transparent);
+  color: var(--sv-gold-100);
+  border-inline-end: 2px solid var(--sv-gold-500);
+}
+
+.sidebar__icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar__footer {
+  margin-top: auto;
+  padding: var(--sv-space-4) var(--sv-space-2) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sv-space-3);
+}
+
+.sidebar__footer-line {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sv-border) 20%, var(--sv-border) 80%, transparent);
+}
+
+.sidebar__footer-text {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--sv-text-600);
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+/* ---------- Top bar & signature orbit accent ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sv-space-6) var(--sv-space-8) 0;
+}
+
+.topbar__title-group {
+  position: relative;
+}
+
+.topbar__title {
+  font-family: var(--sv-font-display);
+  font-weight: 700;
+  font-size: 22px;
+  margin: 0;
+  color: var(--sv-text-100);
+}
+
+.topbar__subtitle {
+  color: var(--sv-text-600);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* The orbit underline echoes the elliptical ring that swoops around the
+   star in the Starvent mark — used once, here, as the page's signature. */
+.topbar__orbit {
+  position: absolute;
+  bottom: -10px;
+  right: 0;
+  width: 72px;
+  height: 10px;
+  overflow: visible;
+}
+
+.topbar__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-3);
+  color: var(--sv-text-600);
+  font-size: 12px;
+}
+
+.topbar__badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--sv-surface-raised);
+  border: 1px solid var(--sv-border);
+  color: var(--sv-gold-300);
+}
+
+/* ---------- Top bar: Jalali clock + always-visible date converter ---------- */
+
+.date-widget {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-3);
+}
+
+.date-widget__clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  background: var(--sv-surface-raised);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  padding: 6px 12px;
+}
+
+.date-widget__date {
+  color: var(--sv-text-100);
+  font-size: 12.5px;
+}
+
+.date-widget__time {
+  color: var(--sv-gold-300);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-widget__converter {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-2);
+  background: var(--sv-surface-raised);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  padding: 6px 10px;
+}
+
+.date-widget__flip {
+  background: transparent;
+  border: 1px solid var(--sv-border-strong);
+  border-radius: var(--sv-radius-sm);
+  color: var(--sv-gold-300);
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.date-widget__flip:hover {
+  border-color: var(--sv-gold-500);
+}
+
+.date-widget__date-input {
+  padding: 5px 6px;
+  font-size: 12px;
+  width: 132px;
+}
+
+.date-widget__jalali-inputs {
+  display: flex;
+  gap: 4px;
+}
+
+.date-widget__jalali-inputs input {
+  padding: 5px 4px;
+  font-size: 12px;
+  width: 44px;
+  text-align: center;
+}
+
+.date-widget__result {
+  font-size: 12.5px;
+  color: var(--sv-gold-300);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Top bar: global search ---------- */
+
+.topbar__search-slot {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--sv-space-6);
+}
+
+.global-search {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+}
+
+.global-search__input {
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 13px;
+  background: var(--sv-surface-raised);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  color: var(--sv-text-100);
+}
+
+.global-search__input:focus {
+  border-color: var(--sv-gold-500);
+}
+
+.global-search__results {
+  position: absolute;
+  top: calc(100% + var(--sv-space-2));
+  right: 0;
+  left: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  background: var(--sv-surface-raised);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  z-index: 30;
+}
+
+.global-search__empty {
+  padding: var(--sv-space-4);
+  font-size: 12.5px;
+  color: var(--sv-text-600);
+  text-align: center;
+}
+
+.global-search__result {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-3);
+  width: 100%;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sv-border);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: right;
+}
+
+.global-search__result:last-child {
+  border-bottom: none;
+}
+
+.global-search__result:hover {
+  background: rgba(227, 191, 92, 0.08);
+}
+
+.global-search__result-group {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--sv-gold-300);
+  background: rgba(227, 191, 92, 0.12);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.global-search__result-title {
+  font-size: 13px;
+  color: var(--sv-text-100);
+  flex-shrink: 0;
+}
+
+.global-search__result-subtitle {
+  font-size: 12px;
+  color: var(--sv-text-600);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+  background: var(--sv-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-lg);
+  padding: var(--sv-space-6);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sv-space-4);
+  margin-top: var(--sv-space-8);
+}
+
+.stat-card {
+  background: var(--sv-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-lg);
+  padding: var(--sv-space-5, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-2);
+}
+
+.stat-card__label {
+  color: var(--sv-text-600);
+  font-size: 12.5px;
+}
+
+.stat-card__value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--sv-text-100);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card__trend {
+  font-size: 12px;
+}
+
+.stat-card__trend[data-trend="up"] {
+  color: var(--sv-success);
+}
+
+.stat-card__trend[data-trend="down"] {
+  color: var(--sv-danger);
+}
+
+.stat-card__trend[data-trend="flat"] {
+  color: var(--sv-text-600);
+}
+
+/* ---------- Tables ---------- */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--sv-space-4);
+  font-size: 13px;
+}
+
+.data-table th {
+  text-align: right;
+  color: var(--sv-text-600);
+  font-weight: 500;
+  padding: var(--sv-space-3);
+  border-bottom: 1px solid var(--sv-border);
+}
+
+.data-table td {
+  text-align: right;
+  padding: var(--sv-space-3);
+  border-bottom: 1px solid var(--sv-border);
+  color: var(--sv-text-100);
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table__low-stock {
+  color: var(--sv-warning);
+  font-weight: 600;
+}
+
+.data-table__sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: color 160ms var(--sv-ease);
+}
+
+.data-table__sortable-th:hover {
+  color: var(--sv-text-100);
+}
+
+.data-table__sortable-th[data-active="true"] {
+  color: var(--sv-gold-300);
+}
+
+.data-table__sortable-th-inner {
+  display: flex;
+  align-items: center;
+  /* This app is RTL (dir="rtl"): flex-start resolves to the right edge,
+     matching the plain `text-align: right` used by non-sortable <th>/<td>
+     cells. Using flex-end here previously pushed sortable headers to the
+     left, so they didn't line up with the column data underneath. */
+  justify-content: flex-start;
+  gap: var(--sv-space-1);
+}
+
+.data-table__sort-icon {
+  display: inline-block;
+  margin-inline-start: var(--sv-space-1);
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+/* ---------- Forms ---------- */
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sv-space-4);
+  margin-bottom: var(--sv-space-4);
+}
+
+label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--sv-text-400);
+  margin-bottom: var(--sv-space-1);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  background: var(--sv-surface-raised);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  color: var(--sv-text-100);
+  padding: 9px 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--sv-gold-500);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--sv-gold-300), var(--sv-gold-500));
+  color: #1a1305;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--sv-radius-sm);
+  padding: 10px 18px;
+  font-size: 13.5px;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--sv-border-strong);
+  color: var(--sv-text-100);
+  border-radius: var(--sv-radius-sm);
+  padding: 10px 18px;
+  font-size: 13.5px;
+}
+
+/* ---------- Signature pad (repairs) ---------- */
+
+.signature-pad {
+  margin-top: var(--sv-space-2);
+}
+
+.signature-pad__canvas {
+  width: 360px;
+  max-width: 100%;
+  height: 140px;
+  border: 1px dashed var(--sv-border-strong);
+  border-radius: var(--sv-radius-sm);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.signature-pad__actions {
+  display: flex;
+  gap: var(--sv-space-2);
+  margin-top: var(--sv-space-2);
+}
+
+.empty-state {
+  color: var(--sv-text-600);
+  text-align: center;
+  padding: var(--sv-space-8);
+}
+
+/* ---------- Direct print (calculator + reusable by any future module) ----------
+   Two hooks, both supported so nothing that already ships depends on just one:
+   - class="print-area" (or id="calc-print-area") marks the block to print
+   - class="no-print" hides an element even inside a printable block           */
+
+@media print {
+  .sidebar,
+  .topbar {
+    display: none !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #calc-print-area,
+  #calc-print-area *,
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  #calc-print-area,
+  .print-area {
+    position: absolute;
+    inset: 0;
+    box-shadow: none;
+    border: none;
+    background: #fff;
+    color: #111;
+    padding: 24px;
+  }
+
+  #calc-print-area .data-table td,
+  .print-area .data-table td {
+    color: #111;
+    border-color: #ccc;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* ---------- Print header (invoice / repair receipt store header) ---------- */
+
+.print-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sv-space-4);
+  padding-bottom: var(--sv-space-4);
+  margin-bottom: var(--sv-space-4);
+  border-bottom: 1px solid var(--sv-border);
+}
+
+.print-header__logo {
+  height: 56px;
+  width: auto;
+  border-radius: 6px;
+}
+
+/* ---------- Prompt preview (prompt builder) ---------- */
+
+.prompt-preview {
+  background: var(--sv-surface-raised);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-sm);
+  padding: var(--sv-space-4);
+  color: var(--sv-text-100);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+/* ---------- Currency input (Toman amounts, thousand-separator) ---------- */
+
+.currency-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-input input {
+  width: 100%;
+  padding-inline-end: 48px;
+  text-align: left;
+  direction: ltr;
+}
+
+.currency-input__suffix {
+  position: absolute;
+  inset-inline-start: 10px;
+  font-size: 12px;
+  color: var(--sv-text-600);
+  pointer-events: none;
+}
+
+/* ---------- Login gate ---------- */
+
+.login-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-screen__card {
+  background: var(--sv-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--sv-border);
+  border-radius: var(--sv-radius-lg);
+  padding: var(--sv-space-8);
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sv-space-4);
+}
+
+.login-screen__logo {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+}
+
+.login-screen__title {
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 0;
+}

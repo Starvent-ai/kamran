@@ -1,0 +1,91 @@
+{
+  "name": "starvent",
+  "productName": "Starvent",
+  "version": "0.1.0",
+  "description": "نرم‌افزار مدیریت موبایل‌فروشی، تعمیرات و فروش گجت — Starvent",
+  "author": "ستاره نوآور یگانه (Starvent)",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/REPLACE-WITH-YOUR-GITHUB-USERNAME/REPLACE-WITH-YOUR-REPO-NAME"
+  },
+  "main": "dist-electron/main/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build:renderer": "vite build",
+    "build:main": "tsc -p tsconfig.main.json && node scripts/copy-preload.mjs",
+    "build": "npm run typecheck && npm run build:renderer && npm run build:main",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.main.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "pack:win": "electron-builder --win --publish never",
+    "release:win": "electron-builder --win --publish always",
+    "dist:win": "npm run build && npm run pack:win"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vazirmatn": "^33.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^31.2.1",
+    "electron-builder": "^24.13.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "jsdom": "^24.1.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.3",
+    "vitest": "^2.0.3"
+  },
+  "build": {
+    "appId": "com.starvent.app",
+    "productName": "Starvent",
+    "copyright": "Copyright © 2026 ستاره نوآور یگانه",
+    "publish": {
+      "provider": "github"
+    },
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist-renderer/**/*",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "dist-electron/main/index.js"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] },
+        { "target": "zip", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Starvent"
+    }
+  }
+}

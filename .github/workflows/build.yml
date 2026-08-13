@@ -1,0 +1,149 @@
+name: Build Starvent (Windows)
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Windows-only, single job, sequential steps — deliberately not a
+# multi-platform matrix, to keep peak memory on the (7 GB RAM) standard
+# runner low. See README.md "یادداشت دربارهٔ CI و مصرف رم" for details.
+jobs:
+  build-windows:
+    # Runs on every push to main, every PR, and every version tag — this is
+    # the same build-and-upload-artifact job as always, completely
+    # unchanged. Tag pushes ALSO trigger the separate publish-release job
+    # below; this job itself never publishes anything.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      # Caps Node's heap so a runaway bundling step fails predictably
+      # instead of exhausting the runner's memory.
+      NODE_OPTIONS: "--max-old-space-size=4096"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # No package-lock.json is committed yet, so setup-node's built-in
+          # `cache: npm` (which requires a lockfile to key off) is skipped
+          # here in favor of the manual actions/cache step below, keyed off
+          # package.json instead.
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Cache electron-builder binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: ${{ runner.os }}-electron-builder-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-builder-
+
+      - name: Install dependencies
+        # No committed package-lock.json yet, so `npm ci` (which requires
+        # one) isn't used here — `npm install` resolves and installs
+        # against the version ranges in package.json instead. Once a
+        # lockfile is committed, switch this back to `npm ci` for fully
+        # reproducible installs.
+        run: npm install
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build renderer + main process
+        run: npm run build
+
+      - name: Package Windows installer, portable build, and zip
+        run: npm run pack:win
+
+      - name: List release output
+        run: dir release
+        shell: cmd
+
+      # Only reached if every step above succeeded — a failed step stops
+      # the job here and no artifact is ever published.
+      - name: Upload final build artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: starvent-windows-build
+          path: |
+            release/*.exe
+            release/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  # Publishes a GitHub Release (with the auto-update metadata electron-updater
+  # needs) — ONLY when a version tag like v1.2.0 is pushed. Regular pushes to
+  # main never reach this job, so the everyday "upload zip → commit → check
+  # Actions → download artifact" workflow in the README is completely
+  # unaffected. This is an opt-in step for whoever manages releases: create
+  # and push a tag (e.g. `git tag v1.2.0 && git push origin v1.2.0`) once
+  # ready to ship an auto-update to everyone already running the app.
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096"
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Cache electron-builder binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: ${{ runner.os }}-electron-builder-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-builder-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build renderer + main process
+        run: npm run build
+
+      - name: Package and publish GitHub Release
+        # Requires package.json's "repository.url" to point at this repo —
+        # see the README note added alongside this workflow.
+        run: npm run release:win

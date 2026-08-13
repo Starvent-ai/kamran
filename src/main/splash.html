@@ -1,0 +1,143 @@
+<!doctype html>
+<!--
+  Splash window content. Loaded directly by the main process (not part of
+  the Vite-bundled renderer), so it intentionally does NOT depend on
+  node_modules (e.g. the Vazirmatn npm font) or any build step — it has to
+  render correctly the instant Electron opens the window, before anything
+  else has run. Colors/spacing below are hand-copied from
+  src/renderer/styles/tokens.css to stay visually consistent with the rest
+  of the app; if the token palette changes, update both places.
+-->
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'none'" />
+    <title>Starvent</title>
+    <style>
+      :root {
+        --sv-bg: #0a0a0d;
+        --sv-border: #2a2a33;
+        --sv-gold-100: #f6e7b4;
+        --sv-gold-300: #e3bf5c;
+        --sv-gold-700: #8a5e10;
+        --sv-silver-500: #a8b0ba;
+        --sv-text-100: #f3f1ea;
+        --sv-text-600: #83828c;
+        --sv-ease: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--sv-bg);
+        overflow: hidden;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        -webkit-app-region: drag;
+        animation: sv-fade-in 320ms var(--sv-ease);
+      }
+
+      .sv-mark {
+        width: 64px;
+        height: 64px;
+      }
+
+      .sv-name {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        color: var(--sv-gold-100);
+      }
+
+      .sv-orbit {
+        width: 96px;
+        height: 14px;
+      }
+
+      .sv-status {
+        font-size: 12px;
+        color: var(--sv-text-600);
+      }
+
+      .sv-tagline {
+        font-size: 13px;
+        color: var(--sv-silver-500);
+        letter-spacing: 0.02em;
+        margin-top: -6px;
+      }
+
+      @keyframes sv-fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes sv-pulse {
+        0%,
+        100% {
+          opacity: 0.35;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .sv-status {
+        animation: sv-pulse 1500ms var(--sv-ease) infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      No separate parent-company (ستاره‌ی نوآور یگانه) logo file exists in
+      this project yet — this reuses the Starvent star mark as a stand-in.
+      Drop a real logo file at src/main/assets/company-logo.png (or .svg)
+      and swap the <svg class="sv-mark"> block below for an <img> tag
+      pointing at it to use the real company logo instead.
+    -->
+    <svg class="sv-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path
+        d="M32 6 L38.5 24.5 L58 26 L42.5 38 L47.5 57 L32 46 L16.5 57 L21.5 38 L6 26 L25.5 24.5 Z"
+        fill="url(#sv-star-gradient)"
+      />
+      <defs>
+        <linearGradient id="sv-star-gradient" x1="6" y1="6" x2="58" y2="57" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="var(--sv-gold-100)" />
+          <stop offset="0.55" stop-color="var(--sv-gold-300)" />
+          <stop offset="1" stop-color="var(--sv-gold-700)" />
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="sv-name">Starvent</div>
+    <div class="sv-tagline">فراتر از فن‌آوری</div>
+
+    <svg class="sv-orbit" viewBox="0 0 72 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M2 6.5C14 -1 58 -1 70 6.5" stroke="url(#sv-orbit-gradient)" stroke-width="1.6" stroke-linecap="round" />
+      <defs>
+        <linearGradient id="sv-orbit-gradient" x1="0" y1="0" x2="72" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#8a5e10" stop-opacity="0" />
+          <stop offset="0.5" stop-color="#e3bf5c" />
+          <stop offset="1" stop-color="#a8b0ba" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="sv-status">در حال بارگذاری…</div>
+  </body>
+</html>

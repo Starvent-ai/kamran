@@ -1,0 +1,60 @@
+/*
+  Starvent design tokens
+  ----------------------
+  Palette sampled directly from the brand mark (gold star + chrome orbit):
+  bright highlight ~#FEEF9A, core gold ~#C8810B — tuned here for UI contrast
+  against a near-black surface, echoing the premium/dark tone of the logo
+  rather than a generic light dashboard.
+*/
+
+:root {
+  /* Surfaces */
+  /* Base page background is now a warm light cream (was near-black) — see
+     the body background-image in global.css for the fine gold veining.
+     Panels ("windows") stay dark, but semi-transparent + blurred, so they
+     read as frosted dark glass floating over the lighter backdrop. */
+  --sv-bg: #f4ecd9;
+  --sv-surface: rgba(20, 20, 24, 0.74);
+  --sv-surface-raised: rgba(28, 28, 35, 0.8);
+  --sv-border: #2a2a33;
+  --sv-border-strong: #38383f;
+
+  /* Brand: gold */
+  --sv-gold-100: #f6e7b4;
+  --sv-gold-300: #e3bf5c;
+  --sv-gold-500: #c9972c;
+  --sv-gold-700: #8a5e10;
+
+  /* Brand: chrome / silver */
+  --sv-silver-300: #e4e7eb;
+  --sv-silver-500: #a8b0ba;
+  --sv-silver-700: #5c636c;
+
+  /* Text */
+  --sv-text-100: #f3f1ea;
+  --sv-text-400: #b9b7c0;
+  --sv-text-600: #83828c;
+
+  /* Semantic */
+  --sv-danger: #e5484d;
+  --sv-success: #34c77b;
+  --sv-warning: #e3a53c;
+
+  /* Type */
+  --sv-font-body: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+  --sv-font-display: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+
+  /* Radii & spacing */
+  --sv-radius-sm: 6px;
+  --sv-radius-md: 10px;
+  --sv-radius-lg: 16px;
+  --sv-space-1: 4px;
+  --sv-space-2: 8px;
+  --sv-space-3: 12px;
+  --sv-space-4: 16px;
+  --sv-space-6: 24px;
+  --sv-space-8: 32px;
+
+  /* Motion */
+  --sv-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
