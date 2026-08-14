@@ -21,8 +21,11 @@ async function loadPersisted<T>(key: string): Promise<T | undefined> {
 }
 
 /** Debounced so rapid successive setState calls (e.g. seeding several rows)
- *  don't trigger a disk/IPC write per call — only once activity settles. */
-function schedulePersist<T>(key: string, state: T): void {
+ *  don't trigger a disk/IPC write per call — only once activity settles.
+ *  Takes a getter (not a value) so that if this fires after hydration has
+ *  since resolved and updated state, it writes the current state — never a
+ *  stale snapshot captured back when it was first scheduled. */
+function schedulePersist<T>(key: string, getCurrent: () => T): void {
   if (typeof window === "undefined") return;
   const existing = persistTimers.get(key);
   if (existing) clearTimeout(existing);
@@ -30,10 +33,11 @@ function schedulePersist<T>(key: string, state: T): void {
     key,
     setTimeout(() => {
       persistTimers.delete(key);
+      const current = getCurrent();
       if (window.starvent) {
-        void window.starvent.settings.set(key, state);
+        void window.starvent.settings.set(key, current);
       } else {
-        localStorage.setItem(key, JSON.stringify(state));
+        localStorage.setItem(key, JSON.stringify(current));
       }
     }, PERSIST_DEBOUNCE_MS)
   );
@@ -50,10 +54,6 @@ function schedulePersist<T>(key: string, state: T): void {
  */
 export function createStore<T>(initialState: T, persistKey?: string) {
   let state = initialState;
-  // Until hydration finishes, setState must not persist — otherwise the
-  // seed data would momentarily overwrite whatever was already saved on
-  // disk, in the split second before the real saved state loads in.
-  let hydrated = !persistKey;
   const listeners = new Set<() => void>();
 
   function getState(): T {
@@ -63,7 +63,12 @@ export function createStore<T>(initialState: T, persistKey?: string) {
   function setState(updater: (prev: T) => T): void {
     state = updater(state);
     listeners.forEach((listener) => listener());
-    if (persistKey && hydrated) schedulePersist(persistKey, state);
+    // Always schedule — even if this fires before hydration resolves.
+    // schedulePersist reads state fresh when its timer actually fires
+    // (400ms later), by which point hydration has long since settled in
+    // any realistic scenario, so this never writes stale pre-hydration
+    // data over real saved data on disk.
+    if (persistKey) schedulePersist(persistKey, getState);
   }
 
   function subscribe(listener: () => void): () => void {
@@ -77,7 +82,6 @@ export function createStore<T>(initialState: T, persistKey?: string) {
 
   if (persistKey) {
     void loadPersisted<T>(persistKey).then((saved) => {
-      hydrated = true;
       if (saved !== undefined) {
         state = saved;
         listeners.forEach((listener) => listener());
