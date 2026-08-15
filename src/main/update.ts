@@ -1,9 +1,10 @@
 import { app, BrowserWindow, ipcMain, shell } from "electron";
-import { autoUpdater } from "electron-updater";
+import electronUpdaterPkg from "electron-updater";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+const { autoUpdater } = electronUpdaterPkg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // electron-updater checks a GitHub Release's `latest.yml` metadata file to
