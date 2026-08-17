@@ -5,7 +5,7 @@ import { useIncomingCaptureListener, useIncomingCaptures } from "./useIncomingCa
 import { useSmsEventQueue } from "./useSmsEventQueue";
 import { useCustomers } from "@/modules/customers/useCustomers";
 import { useInstallments, getNextDueDate } from "@/modules/installments/useInstallments";
-import { gregorianToJalali } from "@/lib/jalali";
+import { gregorianToJalali, jalaliMonthDayFromIsoDate } from "@/lib/jalali";
 import { useCollateral } from "@/modules/collateral/useCollateral";
 import { loadStoreProfile, DEFAULT_STORE_PROFILE, type StoreProfile } from "@/lib/storeProfile";
 import { formatDateForDisplay } from "@/lib/jalali";
@@ -106,7 +106,7 @@ export function Notifications(): JSX.Element {
     const items: { key: string; label: string; target: ComposeTarget }[] = [];
 
     for (const customer of customers) {
-      if (customer.birthdayMonthDay === tomorrowJalaliMonthDay) {
+      if (customer.birthday && jalaliMonthDayFromIsoDate(customer.birthday) === tomorrowJalaliMonthDay) {
         items.push({
           key: `bday-${customer.id}`,
           label: `فردا تولد ${customer.fullName} است`,
@@ -497,7 +497,6 @@ export function Notifications(): JSX.Element {
               id="gw-endpoint"
               value={gatewayConfig.endpoint}
               onChange={(e) => setGatewayConfig((c) => ({ ...c, endpoint: e.target.value }))}
-              placeholder="https://api.panel-example.com/send"
             />
           </div>
         </div>

@@ -30,7 +30,6 @@ const seedTickets: RepairTicket[] = [
     customerId: null,
     customerName: "محمد رضایی",
     deliveryDate: new Date(Date.now() + 2 * 86400000).toISOString().slice(0, 10),
-    customerSignature: null,
     createdAt: new Date().toISOString()
   }
 ];
@@ -62,7 +61,6 @@ function createTicket(input: NewTicketInput): void {
     partsUsed: "",
     laborFee: 0,
     status: "دریافت شده",
-    customerSignature: null,
     createdAt: new Date().toISOString()
   };
   repairsStore.setState((prev) => ({ tickets: [...prev.tickets, ticket] }));
@@ -112,22 +110,13 @@ function updatePartsAndLabor(ticketId: string, partsUsed: string, laborFee: numb
   }));
 }
 
-function setSignature(ticketId: string, signatureDataUrl: string | null): void {
-  repairsStore.setState((prev) => ({
-    tickets: prev.tickets.map((t) =>
-      t.id === ticketId ? { ...t, customerSignature: signatureDataUrl } : t
-    )
-  }));
-}
-
 export function useRepairs() {
   const state = repairsStore.useStore();
   return {
     tickets: state.tickets,
     createTicket,
     updateStatus,
-    updatePartsAndLabor,
-    setSignature
+    updatePartsAndLabor
   };
 }
 
@@ -135,6 +124,5 @@ export const repairActions = {
   createTicket,
   updateStatus,
   updatePartsAndLabor,
-  setSignature,
   getState: repairsStore.getState
 };

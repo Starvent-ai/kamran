@@ -3,12 +3,11 @@ import { ipcMain, type BrowserWindow } from "electron";
 import type Store from "electron-store";
 import type { MobilePriceItem, MobilePriceListResult, MobilePriceSourceConfig } from "../shared/types";
 
-// There is no official API for live mobile/tablet prices in Iran (checked —
-// none of the usual free/paid gold-and-currency providers cover phones).
-// This module is the fallback the user asked for instead: point it at a
-// site that already displays live phone prices, tell it which CSS
-// selectors wrap each product/name/price, and it scrapes that page on a
-// timer so prices show up in the app without retyping them by hand.
+// There is no official API for live mobile/tablet prices in Iran (no
+// free/paid gold-and-currency provider covers phones). Instead, this
+// module scrapes a configured page on a timer: point it at a site that
+// already displays live phone prices, specify which CSS selectors wrap
+// each product/name/price, and prices show up in the app automatically.
 
 const SOURCE_KEY = "mobile-price-source";
 const LIST_KEY = "mobile-price-list";

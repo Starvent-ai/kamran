@@ -22,9 +22,12 @@ export interface Customer {
   phone: string;
   loyaltyTier: LoyaltyTier;
   totalPurchases: number;
-  /** Month and day only (MM-DD) — no year, so this never becomes a stored
-   *  date of birth. Used only to trigger a yearly birthday-SMS reminder. */
-  birthdayMonthDay?: string;
+  /** Full date of birth, stored as a Gregorian ISO date string
+   *  ("YYYY-MM-DD") like every other date in the app — entered via a
+   *  Jalali year/month/day picker and converted on save. Used for the
+   *  yearly birthday-SMS reminder (which compares just the month/day
+   *  part, derived from this) and to know the customer's actual age. */
+  birthday?: string;
 }
 
 export interface SaleRecord {
@@ -114,8 +117,6 @@ export interface RepairTicket {
   customerName: string;
   /** ISO date string (yyyy-mm-dd), estimated delivery date. */
   deliveryDate: string;
-  /** PNG data URL captured from the signature pad, or null until signed. */
-  customerSignature: string | null;
   createdAt: string;
 }
 

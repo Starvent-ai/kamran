@@ -2,8 +2,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useCustomers } from "./useCustomers";
 import { useSortableRows } from "@/components/useSortableRows";
 import { SortableTh } from "@/components/SortableTh";
-import { JalaliMonthDayPicker } from "@/components/JalaliMonthDayPicker";
-import { JALALI_MONTH_NAMES } from "@/lib/jalali";
+import { JalaliDatePicker } from "@/components/JalaliDatePicker";
+import { formatDateForDisplay, gregorianToJalali, jalaliToGregorian, JALALI_MONTH_NAMES } from "@/lib/jalali";
 import { usePendingCustomerIntake } from "@/state/customerIntakeStore";
 import type { Customer, LoyaltyTier } from "@shared/types";
 
@@ -14,7 +14,7 @@ export function Customers(): JSX.Element {
   const { sorted, sortKey, direction, toggleSort } = useSortableRows<Customer>(customers, "fullName");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [birthdayMonthDay, setBirthdayMonthDay] = useState("");
+  const [birthday, setBirthday] = useState("");
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -39,11 +39,11 @@ export function Customers(): JSX.Element {
       fullName: fullName.trim(),
       phone: phone.trim(),
       loyaltyTier: "عادی",
-      birthdayMonthDay: birthdayMonthDay || undefined
+      birthday: birthday || undefined
     });
     setFullName("");
     setPhone("");
-    setBirthdayMonthDay("");
+    setBirthday("");
   }
 
   function startEdit(customer: Customer): void {
@@ -51,7 +51,7 @@ export function Customers(): JSX.Element {
     setEditName(customer.fullName);
     setEditPhone(customer.phone);
     setEditTier(customer.loyaltyTier);
-    setEditBirthday(customer.birthdayMonthDay ?? "");
+    setEditBirthday(customer.birthday ?? "");
     setConfirmDeleteId(null);
   }
 
@@ -65,7 +65,7 @@ export function Customers(): JSX.Element {
       fullName: editName.trim(),
       phone: editPhone.trim(),
       loyaltyTier: editTier,
-      birthdayMonthDay: editBirthday || undefined
+      birthday: editBirthday || undefined
     });
     setEditingId(null);
   }
@@ -100,11 +100,13 @@ export function Customers(): JSX.Element {
                 placeholder="اختیاری"
               />
             </div>
-            <JalaliMonthDayPicker
-              dayInputId="cust-birthday-day"
+            <JalaliDatePicker
+              yearInputId="cust-birthday-year"
               monthInputId="cust-birthday-month"
-              value={birthdayMonthDay}
-              onChange={setBirthdayMonthDay}
+              dayInputId="cust-birthday-day"
+              value={birthday}
+              onChange={setBirthday}
+              label="تولد"
             />
           </div>
           <button type="submit" className="btn-primary">
@@ -127,8 +129,11 @@ export function Customers(): JSX.Element {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((c) =>
-              editingId === c.id ? (
+            {sorted.map((c) => {
+              const editYmd: [number, number, number] = editBirthday
+                ? gregorianToJalali(...(editBirthday.split("-").map(Number) as [number, number, number]))
+                : [1370, 1, 1];
+              return editingId === c.id ? (
                 <tr key={c.id}>
                   <td>
                     <input value={editName} onChange={(e) => setEditName(e.target.value)} />
@@ -155,24 +160,29 @@ export function Customers(): JSX.Element {
                     <div style={{ display: "flex", gap: 4 }}>
                       <input
                         type="number"
-                        min={1}
-                        max={31}
-                        placeholder="روز"
-                        style={{ width: 48 }}
-                        value={editBirthday ? String(Number(editBirthday.split("-")[1])) : ""}
+                        min={1300}
+                        max={1450}
+                        style={{ width: 56 }}
+                        value={editBirthday ? String(editYmd[0]) : ""}
                         onChange={(e) => {
-                          const day = e.target.value.padStart(2, "0");
-                          const month = editBirthday ? editBirthday.split("-")[0] : "01";
-                          setEditBirthday(e.target.value ? `${month}-${day}` : "");
+                          if (!e.target.value) {
+                            setEditBirthday("");
+                            return;
+                          }
+                          const [gy, gm, gd] = jalaliToGregorian(Number(e.target.value), editYmd[1], editYmd[2]);
+                          setEditBirthday(`${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`);
                         }}
                       />
                       <select
                         style={{ width: 90 }}
-                        value={editBirthday ? editBirthday.split("-")[0] : ""}
+                        value={editBirthday ? String(editYmd[1]).padStart(2, "0") : ""}
                         onChange={(e) => {
-                          const month = e.target.value;
-                          const day = editBirthday ? editBirthday.split("-")[1] : "01";
-                          setEditBirthday(month ? `${month}-${day}` : "");
+                          if (!e.target.value) {
+                            setEditBirthday("");
+                            return;
+                          }
+                          const [gy, gm, gd] = jalaliToGregorian(editYmd[0], Number(e.target.value), editYmd[2]);
+                          setEditBirthday(`${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`);
                         }}
                       >
                         <option value="">ماه</option>
@@ -182,6 +192,21 @@ export function Customers(): JSX.Element {
                           </option>
                         ))}
                       </select>
+                      <input
+                        type="number"
+                        min={1}
+                        max={31}
+                        style={{ width: 48 }}
+                        value={editBirthday ? String(editYmd[2]) : ""}
+                        onChange={(e) => {
+                          if (!e.target.value) {
+                            setEditBirthday("");
+                            return;
+                          }
+                          const [gy, gm, gd] = jalaliToGregorian(editYmd[0], editYmd[1], Number(e.target.value));
+                          setEditBirthday(`${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`);
+                        }}
+                      />
                     </div>
                   </td>
                   <td style={{ display: "flex", gap: 8 }}>
@@ -199,11 +224,7 @@ export function Customers(): JSX.Element {
                   <td>{c.phone || "—"}</td>
                   <td>{c.loyaltyTier}</td>
                   <td>{c.totalPurchases}</td>
-                  <td>
-                    {c.birthdayMonthDay
-                      ? `${Number(c.birthdayMonthDay.split("-")[1])}/${Number(c.birthdayMonthDay.split("-")[0])}`
-                      : "—"}
-                  </td>
+                  <td>{c.birthday ? formatDateForDisplay(c.birthday) : "—"}</td>
                   <td style={{ display: "flex", gap: 8 }}>
                     <button type="button" className="btn-secondary" onClick={() => startEdit(c)}>
                       ویرایش
@@ -218,8 +239,8 @@ export function Customers(): JSX.Element {
                     </button>
                   </td>
                 </tr>
-              )
-            )}
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -3,13 +3,15 @@ import { useRepairs } from "./useRepairs";
 import { useCustomers } from "@/modules/customers/useCustomers";
 import { useSortableRows } from "@/components/useSortableRows";
 import { SortableTh } from "@/components/SortableTh";
-import { SignaturePad } from "@/components/SignaturePad";
+import { JalaliDatePicker } from "@/components/JalaliDatePicker";
 import { REPAIR_PRIORITIES, REPAIR_STATUSES, type RepairPriority, type RepairTicket } from "@shared/types";
 import { formatDateForDisplay } from "@/lib/jalali";
 import { CurrencyInput } from "@/components/CurrencyInput";
+import { printRequestActions } from "@/state/printRequestStore";
+import { navigationActions } from "@/state/navigationStore";
 
 export function Repairs(): JSX.Element {
-  const { tickets, createTicket, updateStatus, updatePartsAndLabor, setSignature } = useRepairs();
+  const { tickets, createTicket, updateStatus, updatePartsAndLabor } = useRepairs();
   const { customers } = useCustomers();
   const { sorted, sortKey, direction, toggleSort } = useSortableRows<RepairTicket>(tickets, "createdAt", "desc");
 
@@ -93,6 +95,11 @@ export function Repairs(): JSX.Element {
     updatePartsAndLabor(selectedTicket.id, partsDraft.trim(), laborDraft);
   }
 
+  function handlePrintTicket(ticketId: string, docType: "repair-receipt" | "repair-delivery"): void {
+    printRequestActions.requestRepairPrint(ticketId, docType);
+    navigationActions.goTo("printing");
+  }
+
   return (
     <div>
       <div className="card">
@@ -143,10 +150,14 @@ export function Repairs(): JSX.Element {
               <label htmlFor="rep-tech">تکنسین مسئول</label>
               <input id="rep-tech" value={technician} onChange={(e) => setTechnician(e.target.value)} />
             </div>
-            <div>
-              <label htmlFor="rep-delivery">زمان تحویل تخمینی</label>
-              <input id="rep-delivery" type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} />
-            </div>
+            <JalaliDatePicker
+              yearInputId="rep-delivery-year"
+              monthInputId="rep-delivery-month"
+              dayInputId="rep-delivery-day"
+              value={deliveryDate}
+              onChange={setDeliveryDate}
+              label="تحویل تخمینی"
+            />
           </div>
 
           <div className="form-row">
@@ -275,12 +286,13 @@ export function Repairs(): JSX.Element {
             ذخیرهٔ قطعات و اجرت
           </button>
 
-          <div style={{ marginTop: "var(--sv-space-6)" }}>
-            <label>امضای مشتری (تحویل دستگاه)</label>
-            <SignaturePad
-              existingSignature={selectedTicket.customerSignature}
-              onSave={(dataUrl) => setSignature(selectedTicket.id, dataUrl)}
-            />
+          <div style={{ marginTop: "var(--sv-space-6)", display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" className="btn-secondary" onClick={() => handlePrintTicket(selectedTicket.id, "repair-delivery")}>
+              چاپ رسید تحویلی (کار انجام‌شده و فاکتور)
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => handlePrintTicket(selectedTicket.id, "repair-receipt")}>
+              چاپ رسید تعمیر
+            </button>
           </div>
         </div>
       ) : null}

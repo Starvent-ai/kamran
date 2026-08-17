@@ -72,7 +72,7 @@ export function Collateral(): JSX.Element {
             </div>
             <div>
               <label htmlFor="col-related">مربوط به (فروش/تعمیر/قسط)</label>
-              <input id="col-related" value={relatedTo} onChange={(e) => setRelatedTo(e.target.value)} placeholder="مثلاً: پروندهٔ اقساط محمدی" />
+              <input id="col-related" value={relatedTo} onChange={(e) => setRelatedTo(e.target.value)} />
             </div>
             <div>
               <label htmlFor="col-guarantor">نام ضامن / صادرکننده</label>

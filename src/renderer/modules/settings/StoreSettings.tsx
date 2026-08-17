@@ -354,7 +354,6 @@ export function StoreSettings(): JSX.Element {
             id="ss-printer"
             value={profile.printerName}
             onChange={(e) => update("printerName", e.target.value)}
-            placeholder="مثلاً: پرینتر حرارتی فروشگاه"
           />
         </div>
         <div>
@@ -389,7 +388,6 @@ export function StoreSettings(): JSX.Element {
               id="ss-backup-folder"
               value={profile.backupFolder}
               onChange={(e) => update("backupFolder", e.target.value)}
-              placeholder="مثلاً: D:\\Starvent-Backup"
             />
             <button type="button" className="btn-secondary" onClick={() => void handlePickFolder()}>
               انتخاب پوشه
@@ -522,7 +520,6 @@ export function StoreSettings(): JSX.Element {
             id="ss-proxy"
             value={profile.proxyAddress}
             onChange={(e) => update("proxyAddress", e.target.value)}
-            placeholder="مثلاً: 127.0.0.1:8080"
             disabled={profile.offlineModeEnabled}
           />
         </div>

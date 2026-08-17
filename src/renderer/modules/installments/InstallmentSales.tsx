@@ -209,7 +209,7 @@ export function InstallmentSales(): JSX.Element {
             </div>
             <div>
               <label htmlFor="con-guarantee">یادداشت ضمانت</label>
-              <input id="con-guarantee" value={guaranteeNote} onChange={(e) => setGuaranteeNote(e.target.value)} placeholder="مثلاً: چک شمارهٔ ..." />
+              <input id="con-guarantee" value={guaranteeNote} onChange={(e) => setGuaranteeNote(e.target.value)} />
             </div>
             <div>
               <label htmlFor="con-check-serial">شمارهٔ سریال چک</label>

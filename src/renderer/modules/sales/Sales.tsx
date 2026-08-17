@@ -60,6 +60,11 @@ export function Sales(): JSX.Element {
     }
   }
 
+  function handlePrintSale(saleId: string): void {
+    printRequestActions.requestInvoicePrint(saleId);
+    navigationActions.goTo("printing");
+  }
+
   return (
     <div>
       <div className="card">
@@ -174,6 +179,7 @@ export function Sales(): JSX.Element {
                 <SortableTh label="نوع فروش" sortKeyName="channel" activeKey={sortKey} direction={direction} onSort={toggleSort} />
                 <SortableTh label="روش پرداخت" sortKeyName="paymentMethod" activeKey={sortKey} direction={direction} onSort={toggleSort} />
                 <SortableTh label="تاریخ" sortKeyName="createdAt" activeKey={sortKey} direction={direction} onSort={toggleSort} />
+                <th>عملیات</th>
               </tr>
             </thead>
             <tbody>
@@ -188,6 +194,11 @@ export function Sales(): JSX.Element {
                     <td>{s.channel}</td>
                     <td>{s.paymentMethod}</td>
                     <td>{formatDateForDisplay(s.createdAt)}</td>
+                    <td>
+                      <button type="button" className="btn-secondary" onClick={() => handlePrintSale(s.id)}>
+                        چاپ
+                      </button>
+                    </td>
                   </tr>
                 ))}
             </tbody>

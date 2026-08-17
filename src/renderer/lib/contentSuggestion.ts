@@ -1,13 +1,11 @@
 /**
  * Suggests what kind of Instagram content fits the current hour.
  *
- * IMPORTANT — honesty note: this is a fixed rule-of-thumb schedule, not
- * an analysis of your actual followers' behavior. Starvent has no access
- * to your Instagram account or its analytics, so it can't know when YOUR
- * audience is really most active. Treat this as a generic starting
- * point, not a data-backed recommendation — swap the hours/content below
- * once you know your own audience's real active times (visible in
- * Instagram's own Insights).
+ * This is a fixed rule-of-thumb schedule, not an analysis of actual
+ * follower behavior — the app has no access to Instagram account
+ * analytics. Treat this as a generic starting point; adjust the
+ * hours/content below once real audience activity times are known
+ * (visible in Instagram's own Insights).
  */
 export interface ContentSuggestion {
   hourRange: string;

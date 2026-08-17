@@ -7,9 +7,9 @@ import { useWarehouse } from "@/modules/warehouse/useWarehouse";
 import { DEFAULT_STORE_PROFILE, loadStoreProfile, type StoreProfile } from "@/lib/storeProfile";
 import type { InstallmentContract, RepairTicket, SaleRecord, StockReservation } from "@shared/types";
 import { formatDateForDisplay } from "@/lib/jalali";
-import { usePendingSalePrint, usePendingReservationPrint } from "@/state/printRequestStore";
+import { usePendingSalePrint, usePendingReservationPrint, usePendingRepairPrint } from "@/state/printRequestStore";
 
-type DocType = "invoice" | "repair-receipt" | "installment" | "reservation";
+type DocType = "invoice" | "repair-receipt" | "repair-delivery" | "installment" | "reservation";
 
 export function Printing(): JSX.Element {
   const { sales } = useSales();
@@ -26,6 +26,7 @@ export function Printing(): JSX.Element {
   const [selectedReservationId, setSelectedReservationId] = useState("");
   const { pendingSaleId, clearPendingSaleId } = usePendingSalePrint();
   const { pendingReservationId, clearPendingReservationId } = usePendingReservationPrint();
+  const { pendingRepairPrint, clearPendingRepairPrint } = usePendingRepairPrint();
 
   useEffect(() => {
     if (pendingSaleId) {
@@ -35,6 +36,15 @@ export function Printing(): JSX.Element {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingSaleId]);
+
+  useEffect(() => {
+    if (pendingRepairPrint) {
+      setDocType(pendingRepairPrint.docType);
+      setSelectedTicketId(pendingRepairPrint.ticketId);
+      clearPendingRepairPrint();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingRepairPrint]);
 
   useEffect(() => {
     if (pendingReservationId) {
@@ -78,6 +88,7 @@ export function Printing(): JSX.Element {
             <select id="doc-type" value={docType} onChange={(e) => setDocType(e.target.value as DocType)}>
               <option value="invoice">فاکتور فروش</option>
               <option value="repair-receipt">رسید تعمیر</option>
+              <option value="repair-delivery">رسید تحویلی (کار انجام‌شده و فاکتور)</option>
               <option value="installment">پروندهٔ فروش اقساطی</option>
               <option value="reservation">رسید رزرو کالا</option>
             </select>
@@ -94,7 +105,7 @@ export function Printing(): JSX.Element {
                 ))}
               </select>
             </div>
-          ) : docType === "repair-receipt" ? (
+          ) : docType === "repair-receipt" || docType === "repair-delivery" ? (
             <div>
               <label htmlFor="doc-ticket">تعمیر</label>
               <select id="doc-ticket" value={selectedTicketId} onChange={(e) => setSelectedTicketId(e.target.value)}>
@@ -139,7 +150,7 @@ export function Printing(): JSX.Element {
           disabled={
             docType === "invoice"
               ? !selectedSale
-              : docType === "repair-receipt"
+              : docType === "repair-receipt" || docType === "repair-delivery"
                 ? !selectedTicket
                 : docType === "installment"
                   ? !selectedContract
@@ -164,6 +175,12 @@ export function Printing(): JSX.Element {
         ) : docType === "repair-receipt" ? (
           selectedTicket ? (
             <RepairReceiptBody ticket={selectedTicket} storeProfile={storeProfile} />
+          ) : (
+            <p className="empty-state">یک تعمیر برای پیش‌نمایش انتخاب کنید.</p>
+          )
+        ) : docType === "repair-delivery" ? (
+          selectedTicket ? (
+            <RepairDeliveryBody ticket={selectedTicket} />
           ) : (
             <p className="empty-state">یک تعمیر برای پیش‌نمایش انتخاب کنید.</p>
           )
@@ -295,6 +312,54 @@ const REPAIR_RECEIPT_RULES = [
  *    Starvent) instead of the sample's Nazanin/Titr — those are commercial
  *    fonts this app can't legally bundle.
  */
+/**
+ * The invoice-style handover document: what work was done, which parts
+ * were replaced, and the final amount — separate from RepairReceiptBody
+ * (the liability/signature form), so either can be printed independently.
+ */
+function RepairDeliveryBody({ ticket }: { ticket: RepairTicket }): JSX.Element {
+  return (
+    <div>
+      <h3>رسید تحویلی تعمیر</h3>
+      <p>تاریخ چاپ: {formatDateForDisplay(new Date().toISOString())}</p>
+      <table className="data-table">
+        <tbody>
+          <ReceiptRow label="مشتری" value={ticket.customerName} />
+          <ReceiptRow label="دستگاه" value={ticket.deviceModel} />
+          <ReceiptRow label="شمارهٔ سریال" value={ticket.serialNumber} />
+          <ReceiptRow label="شرح خرابی" value={ticket.faultDescription} />
+          <ReceiptRow label="قطعات تعویض‌شده" value={ticket.partsUsed || "—"} />
+          <ReceiptRow label="تکنسین" value={ticket.technician} />
+          <ReceiptRow label="تاریخ تحویل" value={formatDateForDisplay(ticket.deliveryDate)} />
+          <ReceiptRow label="وضعیت" value={ticket.status} />
+        </tbody>
+      </table>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 12 }}>
+        <tbody>
+          <tr>
+            <td style={{ border: "1px solid #333", padding: "8px 10px", fontWeight: "bold" }}>مبلغ اجرت</td>
+            <td style={{ border: "1px solid #333", padding: "8px 10px" }}>
+              {ticket.laborFee > 0 ? `${ticket.laborFee.toLocaleString("fa-IR")} تومان` : "—"}
+            </td>
+          </tr>
+          <tr>
+            <td style={{ border: "1px solid #333", padding: "8px 10px", fontWeight: "bold" }}>بیعانهٔ دریافتی</td>
+            <td style={{ border: "1px solid #333", padding: "8px 10px" }}>
+              {ticket.depositAmount > 0 ? `${ticket.depositAmount.toLocaleString("fa-IR")} تومان` : "—"}
+            </td>
+          </tr>
+          <tr>
+            <td style={{ border: "1px solid #333", padding: "8px 10px", fontWeight: "bold" }}>مبلغ باقیمانده</td>
+            <td style={{ border: "1px solid #333", padding: "8px 10px" }}>
+              {Math.max(0, ticket.laborFee - ticket.depositAmount).toLocaleString("fa-IR")} تومان
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function RepairReceiptBody({ ticket, storeProfile }: { ticket: RepairTicket; storeProfile: StoreProfile }): JSX.Element {
   const cellStyle: CSSProperties = { border: "1px solid #333", padding: "6px 10px", verticalAlign: "top" };
 

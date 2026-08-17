@@ -20,4 +20,15 @@ describe("printRequestStore", () => {
     expect(printRequestActions.getState().pendingReservationId).toBeNull();
     expect(printRequestActions.getState().pendingSaleId).toBe("sale-abc");
   });
+
+  it("holds the requested repair ticket id and document type until cleared", () => {
+    printRequestActions.requestRepairPrint("rep-1", "repair-delivery");
+    expect(printRequestActions.getState().pendingRepairPrint).toEqual({ ticketId: "rep-1", docType: "repair-delivery" });
+
+    printRequestActions.clearPendingRepairPrint();
+    expect(printRequestActions.getState().pendingRepairPrint).toBeNull();
+
+    printRequestActions.requestRepairPrint("rep-2", "repair-receipt");
+    expect(printRequestActions.getState().pendingRepairPrint).toEqual({ ticketId: "rep-2", docType: "repair-receipt" });
+  });
 });

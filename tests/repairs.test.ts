@@ -56,36 +56,6 @@ describe("repairs", () => {
     expect(updated.deviceModel).toBe("تست قطعات");
   });
 
-  it("stores and clears the customer signature", () => {
-    repairActions.createTicket({
-      deviceModel: "تست امضا",
-      imei: "222",
-      serialNumber: "SN-SIGN",
-      devicePassword: "",
-      faultDescription: "تست",
-      accessoriesReceived: "",
-      priority: "عادی",
-      technician: "تکنسین",
-      customerId: null,
-      customerName: "مشتری",
-      deliveryDate: "2026-08-20",
-      depositAmount: 0,
-      mobilePhone: "",
-      landlinePhone: "",
-      nationalId: ""
-    });
-    const tickets = repairActions.getState().tickets;
-    const created = tickets[tickets.length - 1];
-
-    repairActions.setSignature(created.id, "data:image/png;base64,AAAA");
-    expect(repairActions.getState().tickets.find((t) => t.id === created.id)?.customerSignature).toBe(
-      "data:image/png;base64,AAAA"
-    );
-
-    repairActions.setSignature(created.id, null);
-    expect(repairActions.getState().tickets.find((t) => t.id === created.id)?.customerSignature).toBeNull();
-  });
-
   it("stores the receipt fields (deposit, phones, national ID) added for the printed repair receipt", () => {
     repairActions.createTicket({
       deviceModel: "تست رسید",

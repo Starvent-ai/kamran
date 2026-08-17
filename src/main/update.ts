@@ -16,10 +16,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // project owner deliberately tags a release.
 //
 // Rollback: electron-updater/NSIS don't support a safe, fully-automatic
-// downgrade (there's no signed "previous version" staged locally). Instead
-// of faking that, "بازگشت به نسخهٔ قبلی" just opens the GitHub Releases
-// page so the shopkeeper (or whoever set this up for them) can download and
-// run an older installer by hand — an honest answer, not a pretend one.
+// downgrade (no signed "previous version" staged locally). Instead,
+// "بازگشت به نسخهٔ قبلی" opens the GitHub Releases page so an older
+// installer can be downloaded and run manually if needed.
 
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = false;

@@ -120,6 +120,15 @@ export function jalaliToGregorian(jy: number, jm: number, jd: number): [number, 
   return d2g(j2d(jy, jm, jd));
 }
 
+/** Extracts the recurring Jalali "MM-DD" part from a stored Gregorian ISO
+ *  date string ("YYYY-MM-DD...") — used for yearly reminders (birthdays)
+ *  where only the month/day repeats, not the year. */
+export function jalaliMonthDayFromIsoDate(isoDate: string): string {
+  const [gy, gm, gd] = isoDate.slice(0, 10).split("-").map(Number);
+  const [, jm, jd] = gregorianToJalali(gy, gm, gd);
+  return `${String(jm).padStart(2, "0")}-${String(jd).padStart(2, "0")}`;
+}
+
 export function isLeapJalaliYear(jy: number): boolean {
   return jalCal(jy).leap === 0;
 }

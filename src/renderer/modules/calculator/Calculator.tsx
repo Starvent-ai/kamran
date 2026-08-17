@@ -89,7 +89,7 @@ export function Calculator(): JSX.Element {
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <label htmlFor="calc-note">توضیح روی رسید (اختیاری)</label>
-            <input id="calc-note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="مثلاً: مدل و رنگ دستگاه" />
+            <input id="calc-note" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
         </div>
       </div>

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { gregorianToJalali, isLeapJalaliYear, jalaliToGregorian, jalaliMonthLength, formatDateForDisplay } from "@/lib/jalali";
+import {
+  gregorianToJalali,
+  isLeapJalaliYear,
+  jalaliToGregorian,
+  jalaliMonthLength,
+  jalaliMonthDayFromIsoDate,
+  formatDateForDisplay
+} from "@/lib/jalali";
 
 describe("jalali conversion", () => {
   it("converts known reference dates correctly", () => {
@@ -34,5 +41,11 @@ describe("jalali conversion", () => {
   it("returns unparseable input unchanged instead of throwing", () => {
     expect(formatDateForDisplay("")).toBe("");
     expect(formatDateForDisplay("not-a-date")).toBe("not-a-date");
+  });
+
+  it("extracts the recurring Jalali month-day from a full stored birthday, regardless of year", () => {
+    // 2024-03-20 is 1 فروردین 1403 — same month-day should come back for any birth year.
+    expect(jalaliMonthDayFromIsoDate("2024-03-20")).toBe("01-01");
+    expect(jalaliMonthDayFromIsoDate("1990-03-20")).toBe("01-01");
   });
 });

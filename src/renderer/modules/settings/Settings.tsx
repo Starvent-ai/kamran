@@ -77,7 +77,7 @@ export function Settings(): JSX.Element {
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-..."
+             
               disabled={status === "loading"}
             />
           </div>

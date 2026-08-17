@@ -134,7 +134,6 @@ export function LivePrices(): JSX.Element {
                   dir="ltr"
                   value={config.url}
                   onChange={(e) => updateField("url", e.target.value)}
-                  placeholder="https://example.com/mobile-prices"
                 />
               </div>
               <div>
@@ -156,7 +155,6 @@ export function LivePrices(): JSX.Element {
                   dir="ltr"
                   value={config.itemSelector}
                   onChange={(e) => updateField("itemSelector", e.target.value)}
-                  placeholder=".product-item"
                 />
               </div>
               <div>
@@ -166,7 +164,6 @@ export function LivePrices(): JSX.Element {
                   dir="ltr"
                   value={config.nameSelector}
                   onChange={(e) => updateField("nameSelector", e.target.value)}
-                  placeholder=".product-name"
                 />
               </div>
               <div>
@@ -176,7 +173,6 @@ export function LivePrices(): JSX.Element {
                   dir="ltr"
                   value={config.priceSelector}
                   onChange={(e) => updateField("priceSelector", e.target.value)}
-                  placeholder=".product-price"
                 />
               </div>
             </div>
