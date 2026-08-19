@@ -44,8 +44,12 @@ describe("jalali conversion", () => {
   });
 
   it("extracts the recurring Jalali month-day from a full stored birthday, regardless of year", () => {
-    // 2024-03-20 is 1 فروردین 1403 — same month-day should come back for any birth year.
-    expect(jalaliMonthDayFromIsoDate("2024-03-20")).toBe("01-01");
-    expect(jalaliMonthDayFromIsoDate("1990-03-20")).toBe("01-01");
+    // The Gregorian date of Nowruz (1 فروردین) shifts by ±1 day across
+    // years, so "March 20" alone isn't a valid cross-year fixture — 2000
+    // and 2020 both happen to land on 1 فروردین, unlike e.g. 1990 (21 March
+    // that year). Pick years that are actually 1 فروردین to prove the
+    // month-day extraction is correct, independent of which year it is.
+    expect(jalaliMonthDayFromIsoDate("2000-03-20")).toBe("01-01");
+    expect(jalaliMonthDayFromIsoDate("2020-03-20")).toBe("01-01");
   });
 });
